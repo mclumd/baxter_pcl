@@ -1,0 +1,11 @@
+<launch>
+	<include file="$(find openni2_launch)/launch/openni2.launch">
+	</include>
+	<node pkg="baxter_tools" type="enable_robot.py" name="bax_enable" args="-e"/>
+	<node pkg="baxter_tools" type="tuck_arms.py" name="tuck_arms" args="-u"  />
+	<node pkg="tf" type="static_transform_publisher" name="torso" args="0.2 0 0.2  0 0.580 0.0 /torso /camera_link 50" />
+	<node name="baxter_screen" pkg="my_pcl_tutorial" type="publish_image.py" />
+        <node name="action" pkg = "baxter_interface"   type = "joint_trajectory_action_server.py" />
+	<node name="detect_objects" pkg="my_pcl_tutorial" type="detect_objects" output = "screen" />
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find my_pcl_tutorial)/rviz.rviz" />
+</launch>		
