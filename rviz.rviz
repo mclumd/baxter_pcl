@@ -74,11 +74,27 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.01
       Style: Flat Squares
-      Topic: /camera/depth_registered/points
+      Topic: /semi_filter_output
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Alpha: 1
+      Class: rviz/RobotModel
+      Collision Enabled: false
+      Enabled: false
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+      Name: RobotModel
+      Robot Description: robot_description
+      TF Prefix: ""
+      Update Interval: 0
+      Value: false
+      Visual Enabled: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -103,7 +119,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.210137
+      Distance: 0.461277
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
@@ -115,10 +131,10 @@ Visualization Manager:
         Z: 0
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.310398
+      Pitch: 0.250398
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.0504
+      Yaw: 3.0604
     Saved: ~
 Window Geometry:
   Displays:
@@ -136,5 +152,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1200
-  X: 24
+  X: 15
   Y: 19

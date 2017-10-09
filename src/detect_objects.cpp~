@@ -90,6 +90,8 @@ private:
   ros::Publisher object_pub_;
   ros::Publisher filtered_pub_red_;
   ros::Publisher filtered_pub_blue_;
+  ros::Publisher filtered_pub_orange_;
+  ros::Publisher filtered_pub_yellow_;
   ros::Publisher filtered_pub_green_;
   ros::Publisher filtered_pub_; // filtered point cloud for testing the algorithms
   ros::Publisher plane_pub_; // points that were recognized as part of the table
@@ -136,6 +138,12 @@ public:
 
     // publish the blue points
     filtered_pub_blue_= nh_.advertise< pcl::PointCloud<pcl::PointXYZRGB> >("blue", 1);
+
+    // publish the orange points
+    filtered_pub_orange_= nh_.advertise< pcl::PointCloud<pcl::PointXYZRGB> >("orange", 1);
+
+    // publish the yellow points
+    filtered_pub_yellow_= nh_.advertise< pcl::PointCloud<pcl::PointXYZRGB> >("yellow", 1);
 
     // publish the green points
     filtered_pub_green_= nh_.advertise< pcl::PointCloud<pcl::PointXYZRGB> >("green", 1);
@@ -219,7 +227,7 @@ public:
     	pass.setInputCloud(cloud_filteredZ);
     	pass.setFilterFieldName("x");
     	//pass.setFilterLimits(-0.7,0.7);
-	pass.setFilterLimits(0.1,1.3);
+	pass.setFilterLimits(0.52,1);
     	pass.filter(*cloud_filteredX);
 
 	// Limit to things in front of the robot (x axis filtering)
@@ -403,8 +411,8 @@ public:
 	// set's the input cloud
     	outrem.setInputCloud (cloud);
 	// filter it to the thresholded radius
-    	outrem.setRadiusSearch(0.08);
-	outrem.setMinNeighborsInRadius (10);
+    	outrem.setRadiusSearch(0.06);
+	outrem.setMinNeighborsInRadius (15);
 
 	// finally execute the filtering
     	outrem.filter (*cloud_filtered);
@@ -421,12 +429,12 @@ public:
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered_color (new pcl::PointCloud<pcl::PointXYZRGB>);
   // build the condition 
   pcl::ConditionAnd<pcl::PointXYZRGB>::Ptr color_cond (new pcl::ConditionAnd<pcl::PointXYZRGB> ()); 
-  color_cond->addComparison (pcl::PackedRGBComparison<pcl::PointXYZRGB>::Ptr (new pcl::PackedRGBComparison<pcl::PointXYZRGB> ("r", pcl::ComparisonOps::LT, rMax))); 
-  color_cond->addComparison (pcl::PackedRGBComparison<pcl::PointXYZRGB>::Ptr (new pcl::PackedRGBComparison<pcl::PointXYZRGB> ("r", pcl::ComparisonOps::GT, rMin))); 
-  color_cond->addComparison (pcl::PackedRGBComparison<pcl::PointXYZRGB>::Ptr (new pcl::PackedRGBComparison<pcl::PointXYZRGB> ("g", pcl::ComparisonOps::LT, gMax))); 
-  color_cond->addComparison (pcl::PackedRGBComparison<pcl::PointXYZRGB>::Ptr (new pcl::PackedRGBComparison<pcl::PointXYZRGB> ("g", pcl::ComparisonOps::GT, gMin))); 
-  color_cond->addComparison (pcl::PackedRGBComparison<pcl::PointXYZRGB>::Ptr (new pcl::PackedRGBComparison<pcl::PointXYZRGB> ("b", pcl::ComparisonOps::LT, bMax))); 
-  color_cond->addComparison (pcl::PackedRGBComparison<pcl::PointXYZRGB>::Ptr (new pcl::PackedRGBComparison<pcl::PointXYZRGB> ("b", pcl::ComparisonOps::GT, bMin))); 
+  color_cond->addComparison (pcl::PackedRGBComparison<pcl::PointXYZRGB>::Ptr (new pcl::PackedRGBComparison<pcl::PointXYZRGB> ("r", pcl::ComparisonOps::LE, rMax))); 
+  color_cond->addComparison (pcl::PackedRGBComparison<pcl::PointXYZRGB>::Ptr (new pcl::PackedRGBComparison<pcl::PointXYZRGB> ("r", pcl::ComparisonOps::GE, rMin))); 
+  color_cond->addComparison (pcl::PackedRGBComparison<pcl::PointXYZRGB>::Ptr (new pcl::PackedRGBComparison<pcl::PointXYZRGB> ("g", pcl::ComparisonOps::LE, gMax))); 
+  color_cond->addComparison (pcl::PackedRGBComparison<pcl::PointXYZRGB>::Ptr (new pcl::PackedRGBComparison<pcl::PointXYZRGB> ("g", pcl::ComparisonOps::GE, gMin))); 
+  color_cond->addComparison (pcl::PackedRGBComparison<pcl::PointXYZRGB>::Ptr (new pcl::PackedRGBComparison<pcl::PointXYZRGB> ("b", pcl::ComparisonOps::LE, bMax))); 
+  color_cond->addComparison (pcl::PackedRGBComparison<pcl::PointXYZRGB>::Ptr (new pcl::PackedRGBComparison<pcl::PointXYZRGB> ("b", pcl::ComparisonOps::GE, bMin))); 
    
    // build the filter 
    pcl::ConditionalRemoval<pcl::PointXYZRGB> condrem;
@@ -522,8 +530,23 @@ public:
 	std::string dimensions_red = "";
 	std::string dimensions_blue = "";
 	std::string dimensions_green = "";
+	std::string dimensions_orange = "";
+	std::string dimensions_yellow = "";
+	int r_max ;
+	int r_min ;
+	int g_max;
+	int g_min;
+	int b_max;
+	int b_min;
+
 	// red cloud
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_red = PointCloudLab::check_color(cloud ,255,130,110,150,60,55);
+	r_max = 130;
+	g_max = 60;
+	b_max = 70;
+	r_min = 45;	
+	g_min = 0;
+	b_min = 0;
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_red = PointCloudLab::check_color(cloud ,r_max,g_max,b_max,r_min,g_min,b_min);
 	if (cloud_red->points.size() != 0)
 		{
 		cloud_red = remove_outliers(cloud_red); //removes outliers
@@ -534,7 +557,13 @@ public:
 	
 	
 	// green cloud
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_green = PointCloudLab::check_color(cloud ,140,255,110,65,150,35);
+	r_max = 50;
+	g_max = 150;
+	b_max = 50;//30;
+	r_min = 0;
+	g_min = 40;
+	b_min = 0;
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_green = PointCloudLab::check_color(cloud ,r_max,g_max,b_max,r_min,g_min,b_min);
 	if (cloud_green->points.size() != 0)
 		{
 		cloud_green = remove_outliers(cloud_green);
@@ -545,12 +574,56 @@ public:
 	
 	
 	//blue cloud
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_blue = PointCloudLab::check_color(cloud ,100,120,170,50,70,100);
+	/*
+	r_max = 35;
+	g_max = 40;
+	b_max = 100;
+	r_min = 0;
+	g_min = 0;
+	b_min = 45;
+	*/
+	r_max = 50;
+	g_max = 80;
+	b_max = 255;
+	r_min = 0;
+	g_min = 0;
+	b_min = 60;
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_blue = PointCloudLab::check_color(cloud ,r_max,g_max,b_max,r_min,g_min,b_min);
 	if (cloud_blue->points.size() != 0)
 		{
 		cloud_blue = remove_outliers(cloud_blue);
 		dimensions_blue = check_block_dimensions(cloud_blue);
 		filtered_pub_blue_.publish(cloud_blue);
+		}
+
+	//orange cloud
+	r_max = 255;
+	g_max = 210;
+	b_max = 130;
+	r_min = 90;
+	g_min = 50;
+	b_min = 20;
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_orange = PointCloudLab::check_color(cloud ,r_max,g_max,b_max,r_min,g_min,b_min);
+	if (cloud_orange->points.size() != 0)
+		{
+		cloud_orange = remove_outliers(cloud_orange);
+		dimensions_orange = check_block_dimensions(cloud_orange);
+		filtered_pub_orange_.publish(cloud_orange);
+		}
+
+	//yellow cloud
+	r_max = 256;
+	g_max = 256;
+	b_max = 215;
+	r_min = 250;
+	g_min = 230;
+	b_min = 130;
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_yellow = PointCloudLab::check_color(cloud ,r_max,g_max,b_max,r_min,g_min,b_min);
+	if (cloud_yellow->points.size() != 0)
+		{
+		cloud_yellow = remove_outliers(cloud_yellow);
+		dimensions_yellow = check_block_dimensions(cloud_yellow);
+		filtered_pub_yellow_.publish(cloud_yellow);
 		}
 
 	
@@ -561,6 +634,10 @@ public:
 		str = str + "green block:" + dimensions_green + ";";
 	if (dimensions_blue != "")
 		str = str + "blue block:" + dimensions_blue + ";";
+	if (dimensions_orange != "")
+		str = str + "orange block:" + dimensions_orange + ";";
+	if (dimensions_yellow != "")
+		str = str + "yellow block:" + dimensions_yellow + ";";
 
     	std_msgs::String msg;
     	msg.data = str;
@@ -636,9 +713,12 @@ public:
 	
    
     	//offsets
-	x = x + 0.09;
-	y = y + 0.116;
-	z= z + 0.20;
+	//x = x - 0.03;
+	//y = y + 0.151;
+	//z= z + 0.20;
+	x = x - 0.01 ;
+	y = y + 0.04;
+	z = z + 0.19;
     	geometry_msgs::Pose block_pose;
     	block_pose.position.x = x;
     	block_pose.position.y = y;
